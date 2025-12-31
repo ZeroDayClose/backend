@@ -16,6 +16,25 @@ ZeroDayClose provides a set of core features that power all automation modules.
 | [Data Ingestion](data-ingestion.md) | Multi-source data collection and normalization |
 | [Semantic Search](semantic-search.md) | Natural language querying of financial data |
 | [Cash Application](cash-application.md) | AI-powered payment matching |
+| [Exception Workflow](exception-workflow.md) | Human-in-the-loop oversight for uncertain cases |
+| [Dashboards](dashboards.md) | Real-time financial intelligence and visualizations |
+| [Alerts & Notifications](alerts-notifications.md) | Proactive awareness for finance teams |
+| [Continuous Learning](continuous-learning.md) | AI improvement based on user feedback |
+
+---
+
+## Detailed Feature Documentation
+
+Comprehensive documentation for each major module:
+
+| Feature | Description |
+|---------|-------------|
+| [Automated Close (Detailed)](automated-close-detailed.md) | Complete reference for month-end close automation |
+| [Revenue Automation (Detailed)](revenue-automation-detailed.md) | Complete reference for ASC 606/IFRS 15 compliance |
+| [Cash Automation (Detailed)](cash-automation-detailed.md) | Complete reference for AR/AP and treasury management |
+| [Board Reporting (Detailed)](board-reporting-detailed.md) | Complete reference for consolidation and reporting |
+| [Instant Answers (Detailed)](instant-answers-detailed.md) | Complete reference for AI-powered Q&A |
+| [Platform Features (Detailed)](platform-features-detailed.md) | Complete reference for cross-cutting capabilities |
 
 ---
 

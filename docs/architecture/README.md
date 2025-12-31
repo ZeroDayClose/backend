@@ -64,3 +64,4 @@ ZeroDayClose follows a four-layer architecture designed for scalability, securit
 - [System Layers](system-layers.md) — Detailed breakdown of each layer
 - [Sidecar Pattern](sidecar-pattern.md) — How we integrate without replacing
 - [Shadow Ledger](shadow-ledger.md) — High-performance parallel ledger design
+- [Technical Architecture (Detailed)](technical-architecture-detailed.md) — Comprehensive technical reference
