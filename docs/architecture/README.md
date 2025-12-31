@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Architecture Overview
 
 ZeroDayClose follows a four-layer architecture designed for scalability, security, and ERP-agnostic operation.

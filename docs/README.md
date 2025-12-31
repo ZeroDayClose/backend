@@ -1,3 +1,8 @@
+---
+slug: /
+sidebar_label: Home
+---
+
 # ZeroDayClose
 
 > **AI-native Finance Operation System with Audit-Ready Automation**

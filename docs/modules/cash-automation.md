@@ -61,6 +61,8 @@ ZeroDayClose automates these processes with AI-powered matching and real-time co
 
 ### Cash Flow Forecasting
 
+The forecasting engine provides actionable cash projections that help treasury teams plan ahead.
+
 <details>
 <summary><strong>Forecasting Capabilities</strong></summary>
 
@@ -70,6 +72,36 @@ ZeroDayClose automates these processes with AI-powered matching and real-time co
 | **Burn Rate Reporting** | Real-time burn rate calculation with runway analysis |
 | **Scenario Modeling** | What-if analysis (e.g., impact of delayed collections) |
 | **Trend Analysis** | Historical pattern recognition for improved accuracy |
+| **Runway Analysis** | Months of runway remaining at current burn rate |
+
+</details>
+
+<details>
+<summary><strong>Forecast Data Sources</strong></summary>
+
+The forecast engine pulls from multiple sources for accuracy:
+
+| Source | Data Used |
+|--------|-----------|
+| **AP Schedules** | Upcoming payments, payment terms, vendor patterns |
+| **AR Aging** | Expected collections, customer payment history |
+| **Payroll Dates** | Scheduled payroll disbursements |
+| **Recurring Expenses** | Subscriptions, rent, utilities |
+| **Revenue Schedules** | Expected billings and collections |
+| **Historical Trends** | Seasonality and pattern analysis |
+
+</details>
+
+<details>
+<summary><strong>Forecast Outputs</strong></summary>
+
+| Output | Description |
+|--------|-------------|
+| **Daily Cash Position** | Projected balance for each day |
+| **Weekly Summary** | Inflows vs. outflows by week |
+| **Liquidity Alerts** | Warning when projected balance drops below threshold |
+| **Confidence Intervals** | Range estimates (optimistic/pessimistic scenarios) |
+| **Variance Analysis** | Actual vs. forecast comparison with explanations |
 
 </details>
 
@@ -93,3 +125,38 @@ The system automatically matches:
 - **AP Bills:** Payment sent → Open bill → Vendor account
 
 Exceptions are routed to the human review queue with AI-suggested matches.
+
+---
+
+## Expense Categorization
+
+The system automatically categorizes transactions:
+
+| Feature | Description |
+|---------|-------------|
+| **Auto-Categorization** | AI-powered expense category assignment |
+| **Vendor Learning** | Learns from historical categorizations |
+| **Policy Enforcement** | Flags violations of expense policies |
+| **Receipt Matching** | Links transactions to uploaded receipts |
+
+---
+
+## Liquidity Dashboard
+
+A dedicated dashboard for treasurers provides:
+
+| View | Description |
+|------|-------------|
+| **Daily Cash by Account** | Balance breakdown across all accounts |
+| **Upcoming Payments** | Scheduled outflows for the next 30 days |
+| **Expected Collections** | Projected AR collections |
+| **Forecast Runway** | Visual runway with scenario toggles |
+| **Cash Burn Chart** | Trend visualization of burn rate |
+
+---
+
+## Related Features
+
+- [Cash Application (Matcher)](../features/cash-application.md) — Detailed matching algorithm
+- [Dashboards](../features/dashboards.md) — Liquidity and treasury dashboards
+- [Alerts](../features/alerts-notifications.md) — Cash threshold alerts

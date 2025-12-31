@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Integrations Overview
 
 ZeroDayClose connects to your existing finance stack without requiring system replacement.

@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Modules Overview
 
 ZeroDayClose is organized into four core automation modules, each targeting a specific area of the finance close process.

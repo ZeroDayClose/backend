@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Features Overview
 
 ZeroDayClose provides a set of core features that power all automation modules.

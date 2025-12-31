@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Solution Overview
 
 ZeroDayClose is designed around six core solution pillars that differentiate it from traditional accounting software.

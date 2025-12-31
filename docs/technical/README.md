@@ -1,3 +1,7 @@
+---
+sidebar_label: Overview
+---
+
 # Technical Reference
 
 Technical documentation for developers and system administrators.
