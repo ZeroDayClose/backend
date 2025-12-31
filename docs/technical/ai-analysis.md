@@ -90,7 +90,7 @@ Every AI decision includes a confidence score (0-100%):
 | **95-100%** | Very high confidence | Auto-approve |
 | **85-94%** | High confidence | May auto-approve based on policy |
 | **75-84%** | Medium confidence | Human review recommended |
-| **<75%** | Low confidence | Human review required |
+| **&lt;75%** | Low confidence | Human review required |
 
 ---
 
@@ -117,8 +117,8 @@ Every AI decision includes a confidence score (0-100%):
 3. **Graph Traversal** — Multi-hop path: Transaction → Vendor → Historical Pattern → Account
 4. **Store Reasoning** — Save AI reasoning for audit
 5. **Route by Confidence:**
-   - `<75%` → Flag for human review
-   - `>95%` → Auto-approve (optional setting)
+   - `&lt;75%` → Flag for human review
+   - `&gt;95%` → Auto-approve (optional setting)
 6. **Learn from Corrections** — Update graph when human corrects
 
 </details>

@@ -82,10 +82,10 @@ The system routes based on confidence and materiality:
 
 | Confidence Level | Materiality | Action |
 |------------------|-------------|--------|
-| **>99%** | Any | Auto-post to ERP |
+| **&gt;99%** | Any | Auto-post to ERP |
 | **95-99%** | Low | Auto-post to ERP |
 | **95-99%** | High | Route to human reviewer |
-| **<95%** | Any | Route to human reviewer |
+| **&lt;95%** | Any | Route to human reviewer |
 
 Human reviewers receive:
 - The proposed action
