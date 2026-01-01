@@ -93,3 +93,76 @@ All heavy processing is handled asynchronously:
 - **Task Queues:** Redis + Celery for background job processing
 - **Workflow Orchestration:** Temporal.io for long-running, fault-tolerant workflows
 - **Event-Driven:** Near real-time sync ensures the Unified Finance Context stays current
+
+---
+
+## Event-Driven Architecture
+
+ZeroDayClose employs an event-driven architecture that enables loose coupling, real-time processing, and seamless scalability across all system layers.
+
+### Event Flow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    EVENT-DRIVEN FLOW                             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Layer 1 (Integration)                                          │
+│  ┌─────────────┐                                                │
+│  │ Connector   │──▶ Event: data.synced ──────────────┐          │
+│  └─────────────┘                                      │          │
+│                                                       ▼          │
+│  Layer 2 (Data)                              ┌─────────────┐    │
+│  ┌─────────────┐                             │ Event Bus   │    │
+│  │ Context     │◀── Event: graph.updated ◀──│ (Kafka/     │    │
+│  │ Graph       │                             │  Redis)     │    │
+│  └─────────────┘                             └─────────────┘    │
+│                                                       │          │
+│  Layer 3 (AI/Orchestration)                          ▼          │
+│  ┌─────────────┐                             ┌─────────────┐    │
+│  │ Agent       │◀── Event: task.assigned ◀──│ Workflow    │    │
+│  │ Framework   │──▶ Event: task.completed ──▶│ Engine      │    │
+│  └─────────────┘                             └─────────────┘    │
+│                                                       │          │
+│  Layer 4 (Frontend)                                  ▼          │
+│  ┌─────────────┐                             ┌─────────────┐    │
+│  │ Dashboard   │◀── Event: ui.update ◀──────│ WebSocket   │    │
+│  │ Components  │                             │ Gateway     │    │
+│  └─────────────┘                             └─────────────┘    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Event Categories
+
+| Category | Examples | Consumers |
+|----------|----------|-----------|
+| **Data Events** | `data.synced`, `transaction.created`, `balance.updated` | AI Layer, Analytics |
+| **Workflow Events** | `task.assigned`, `task.completed`, `approval.required` | Notification Service, Dashboard |
+| **AI Events** | `prediction.made`, `anomaly.detected`, `learning.updated` | Audit Log, Context Graph |
+| **User Events** | `user.action`, `correction.made`, `exception.resolved` | Learning System, Analytics |
+
+### Technology Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Event Broker** | Apache Kafka / Redis Streams | Reliable event delivery |
+| **Event Schema** | Apache Avro / JSON Schema | Schema validation |
+| **Dead Letter Queue** | Kafka DLQ | Failed event handling |
+| **Event Replay** | Kafka offset management | Reprocess historical events |
+
+### Benefits
+
+- **Loose Coupling** — Services communicate via events, not direct calls
+- **Real-Time Updates** — Dashboard reflects changes immediately
+- **Scalability** — Add consumers without modifying producers
+- **Auditability** — Complete event history for compliance
+- **Resilience** — Failed events retry automatically
+
+---
+
+## Related Documentation
+
+- [Technical Architecture](technical-architecture-detailed.md)
+- [Sidecar Pattern](sidecar-pattern.md)
+- [Shadow Ledger](shadow-ledger.md)

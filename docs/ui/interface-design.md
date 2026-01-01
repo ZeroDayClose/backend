@@ -206,8 +206,125 @@ The interface adapts to different screen sizes:
 
 ---
 
+## Keyboard Shortcuts
+
+Power users can navigate and operate the entire application using keyboard shortcuts for faster workflow execution.
+
+### Global Shortcuts
+
+| Shortcut | Action | Context |
+|----------|--------|---------|
+| `Cmd/Ctrl + K` | Open command palette / search | Anywhere |
+| `Cmd/Ctrl + /` | Open keyboard shortcuts help | Anywhere |
+| `Cmd/Ctrl + .` | Toggle voice input | Anywhere |
+| `Esc` | Close modal / cancel operation | Modals, forms |
+| `?` | Open contextual help | Most pages |
+
+### Navigation Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `G then D` | Go to Dashboard |
+| `G then C` | Go to Close module |
+| `G then R` | Go to Revenue module |
+| `G then $` | Go to Cash module |
+| `G then S` | Go to Search / Instant Answers |
+| `G then E` | Go to Exceptions queue |
+| `G then N` | Go to Notifications |
+
+### Table Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `J` / `K` | Move down / up in list |
+| `Enter` | Open selected item |
+| `Space` | Toggle selection |
+| `Cmd/Ctrl + A` | Select all |
+| `X` | Mark item for bulk action |
+| `E` | Edit selected item |
+| `D` | View details panel |
+
+### Exception Workflow Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `A` | Approve selected exception |
+| `R` | Reject selected exception |
+| `M` | Modify and approve |
+| `C` | Add comment |
+| `@` | Start @mention in comment |
+| `N` | Next exception |
+| `P` | Previous exception |
+
+### Search & Query Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `/` | Focus search bar |
+| `Cmd/Ctrl + Enter` | Execute query |
+| `Up/Down` | Navigate query history |
+| `Tab` | Accept autocomplete suggestion |
+| `Cmd/Ctrl + .` | Toggle voice input |
+
+### Customization
+
+Users can customize shortcuts in Settings:
+- View all available shortcuts
+- Reassign keys to preferred combinations
+- Export/import shortcut configurations
+- Reset to defaults
+
+---
+
+## Collaborative Features
+
+Real-time collaboration enables teams to work together on exceptions, reviews, and analysis.
+
+### Presence Indicators
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Exception #1234 - Payment Match Review                         │
+│                                                                  │
+│  Currently viewing:  [Avatar] Sarah  [Avatar] John  [+2]        │
+│                       ▲ typing...                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Collaboration Components
+
+| Component | Description |
+|-----------|-------------|
+| **Avatar Stack** | Shows who is viewing the same item |
+| **Typing Indicator** | Shows when others are composing comments |
+| **Cursor Presence** | See where others are looking (optional) |
+| **Live Annotations** | See highlights and comments in real-time |
+| **Notification Dot** | Indicates new activity on item |
+
+### Real-Time Sync Technology
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Presence** | WebSocket + Redis Pub/Sub | Track active users per item |
+| **Collaboration** | Liveblocks / Y.js | Real-time annotation sync |
+| **Comments** | WebSocket | Instant comment delivery |
+| **Conflict Resolution** | CRDT (Yjs) | Handle simultaneous edits |
+
+### Collaboration Settings
+
+| Setting | Options |
+|---------|---------|
+| **Presence Visibility** | Show me as active / Away / Invisible |
+| **Notification Sound** | On / Off / Mentions only |
+| **Cursor Sharing** | Enable / Disable |
+| **Auto-refresh** | Real-time / 30s / Manual |
+
+---
+
 ## Related Features
 
 - [Guided Workflows](guided-workflows.md) — Process checklists
 - [Dashboards](../features/dashboards.md) — Dashboard details
 - [Frontend Stack](../technical/frontend-stack.md) — Technical implementation
+- [Exception Workflow](../features/exception-workflow.md) — Collaborative annotations in action

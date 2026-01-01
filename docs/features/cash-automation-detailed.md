@@ -496,7 +496,94 @@
  
  ---
  
- ## 8. Related Documentation
+## 8. Async Batch Processing
+
+Large-scale cash operations are processed asynchronously in batches for performance and reliability.
+
+### 8.1 Batch Processing Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   BATCH PROCESSING FLOW                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
+│  │  Batch      │────▶│   Queue     │────▶│  Worker     │        │
+│  │  Request    │     │  (Celery)   │     │   Pool      │        │
+│  └─────────────┘     └─────────────┘     └─────────────┘        │
+│                                                 │                │
+│                        ┌────────────────────────┤                │
+│                        ▼                        ▼                │
+│                 ┌─────────────┐         ┌─────────────┐         │
+│                 │  Parallel   │         │  Progress   │         │
+│                 │  Execution  │         │  WebSocket  │         │
+│                 └─────────────┘         └─────────────┘         │
+│                        │                        │                │
+│                        ▼                        ▼                │
+│                 ┌─────────────┐         ┌─────────────┐         │
+│                 │  Results    │         │  Real-Time  │         │
+│                 │  Storage    │         │  Dashboard  │         │
+│                 └─────────────┘         └─────────────┘         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Batch-Enabled Operations
+
+| Operation | Default Batch Size | Parallelism | Typical Duration |
+|-----------|-------------------|-------------|------------------|
+| **Bank Transaction Import** | 10,000 transactions | 10 workers | 2-5 minutes |
+| **Payment Matching** | 1,000 payments | 20 workers | 1-3 minutes |
+| **Invoice Bulk Upload** | 5,000 invoices | 5 workers | 3-5 minutes |
+| **Expense Categorization** | 2,000 transactions | 10 workers | 1-2 minutes |
+| **Cash Position Calculation** | All accounts | 5 workers | 30 seconds |
+| **Forecast Generation** | 13 weeks | 1 worker | 15-30 seconds |
+
+### 8.3 Batch Features
+
+| Feature | Description |
+|---------|-------------|
+| **Real-Time Progress** | WebSocket updates showing completion percentage |
+| **Partial Failure Handling** | Continue processing; collect errors separately |
+| **Automatic Retry** | Failed items retry with exponential backoff |
+| **Priority Queues** | Urgent batches processed ahead of routine |
+| **Checkpointing** | Resume from last successful item on crash |
+| **Cancellation** | User can cancel in-progress batch |
+| **Rate Limiting** | Respect bank/ERP API limits |
+
+### 8.4 Progress Tracking UI
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Bank Transaction Import - January 2025                         │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Progress: ████████████████████░░░░░░░░░░ 67%                   │
+│                                                                  │
+│  Processed:  6,700 / 10,000 transactions                        │
+│  Matched:    6,450 (96.3%)                                      │
+│  Pending:    200                                                │
+│  Errors:     50 (will retry)                                    │
+│                                                                  │
+│  Elapsed: 2m 15s    Est. Remaining: 1m 05s                      │
+│                                                                  │
+│  [View Errors]  [Pause]  [Cancel]                               │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.5 Error Handling
+
+| Error Type | Handling |
+|------------|----------|
+| **Transient** | Automatic retry (3 attempts) |
+| **Validation** | Skip item, log to error report |
+| **Rate Limit** | Pause batch, resume after cooldown |
+| **System** | Checkpoint, alert admin, resume on recovery |
+
+---
+
+## 9. Related Documentation
  
  - [Cash Automation Module Overview](../modules/cash-automation.md)
  - [Cash Application Feature](cash-application.md)

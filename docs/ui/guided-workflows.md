@@ -190,8 +190,132 @@ The workflow system sends reminders:
 
 ---
 
+## No-Code Workflow Builder
+
+Finance teams can create, customize, and manage workflows without developer assistance using the visual workflow builder.
+
+### Builder Interface
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  WORKFLOW BUILDER - Custom Month-End Close                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │                     CANVAS                               │    │
+│  │                                                          │    │
+│  │  [Start] ──▶ [Bank Recon] ──▶ [AR Recon] ──┐            │    │
+│  │                                             │            │    │
+│  │              [AP Recon] ◀──────────────────┘            │    │
+│  │                  │                                       │    │
+│  │                  ▼                                       │    │
+│  │           ┌──────────────┐                              │    │
+│  │           │  Parallel    │                              │    │
+│  │           │   ┌────┬────┐│                              │    │
+│  │           │   │Accr│Depr││                              │    │
+│  │           │   └────┴────┘│                              │    │
+│  │           └──────┬───────┘                              │    │
+│  │                  ▼                                       │    │
+│  │           [Controller Approval] ──▶ [Close Period]      │    │
+│  │                                                          │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  COMPONENT PALETTE                                              │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ [Reconciliation] [Journal Entry] [Approval] [Notify]   │    │
+│  │ [Condition] [Parallel] [Wait] [Manual Task] [Webhook]  │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  [Save Draft] [Test Workflow] [Publish]     [Import] [Export]  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Drag-and-Drop Components
+
+| Component | Description | Configuration Options |
+|-----------|-------------|----------------------|
+| **Reconciliation** | Auto-reconcile account | Account, tolerance, confidence threshold |
+| **Journal Entry** | Generate/post JE | Template, accounts, calculation formula |
+| **Approval** | Require human approval | Approver role, timeout, escalation path |
+| **Notification** | Send alert | Channel (email/Slack), recipients, template |
+| **Condition** | Branch logic | If/else rules, threshold comparisons |
+| **Parallel** | Concurrent tasks | Tasks to run, merge condition (all/any) |
+| **Wait** | Pause workflow | Duration, or wait for event |
+| **Manual Task** | Human action needed | Assignee, instructions, due date |
+| **Webhook** | Call external API | URL, method, payload, auth |
+
+### Workflow Templates
+
+Pre-built templates to start from:
+
+| Template | Description | Complexity |
+|----------|-------------|------------|
+| **Standard Close** | Full month-end workflow | 12 steps |
+| **Quick Close** | Streamlined for mature orgs | 8 steps |
+| **First Close** | Guided for new implementations | 10 steps |
+| **Revenue Only** | Just revenue recognition | 6 steps |
+| **Cash Only** | Cash and AR focus | 5 steps |
+| **Audit-Ready** | Extra documentation steps | 15 steps |
+
+### Builder Features
+
+| Feature | Description |
+|---------|-------------|
+| **Visual Editor** | Drag, drop, connect components |
+| **Version Control** | Save versions, compare, rollback |
+| **Test Mode** | Dry-run without posting |
+| **Clone Workflow** | Duplicate and modify |
+| **Import/Export** | Share as JSON/YAML |
+| **Scheduling** | Auto-trigger at period end |
+| **Variables** | Reusable parameters (thresholds, accounts) |
+| **Conditional Logic** | If/else branching based on data |
+
+### Component Configuration
+
+Each component has a configuration panel:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  CONFIGURE: Bank Reconciliation                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Name:        [Operating Account Recon          ]               │
+│                                                                  │
+│  Account:     [1000 - Operating Account    ▼]                   │
+│                                                                  │
+│  Tolerance:   [$] [100.00    ]                                  │
+│                                                                  │
+│  Auto-approve if confidence > [95] %                            │
+│                                                                  │
+│  On failure:  ○ Stop workflow                                   │
+│               ● Continue and flag                               │
+│               ○ Retry 3 times                                   │
+│                                                                  │
+│  Assignee:    [@sarah (Accountant)     ▼]                       │
+│                                                                  │
+│  [Cancel]                                         [Save]        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Workflow Testing
+
+Before publishing, test workflows in sandbox mode:
+
+| Test Feature | Description |
+|--------------|-------------|
+| **Dry Run** | Execute without posting to ERP |
+| **Sample Data** | Use historical or synthetic data |
+| **Step-Through** | Pause at each step for inspection |
+| **Validation** | Check for missing configs, dead ends |
+| **Simulation** | Predict duration and resource usage |
+
+---
+
 ## Related Features
 
 - [Exception Workflow](../features/exception-workflow.md) — Handle flagged items
 - [Dashboards](../features/dashboards.md) — Close status dashboard
 - [Alerts](../features/alerts-notifications.md) — Workflow notifications
+- [Automated Close](../features/automated-close-detailed.md) — Close automation details

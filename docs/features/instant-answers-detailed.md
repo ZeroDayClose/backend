@@ -511,7 +511,129 @@
  
  ---
  
- ## 8. Related Documentation
+## 8. Streaming Responses
+
+For optimal user experience, Instant Answers streams responses in real-time as the LLM generates them.
+
+### 8.1 Streaming Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   STREAMING RESPONSE FLOW                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐   │
+│  │  User   │────▶│ FastAPI │────▶│   LLM   │────▶│ Stream  │   │
+│  │  Query  │     │Streaming│     │   API   │     │ Tokens  │   │
+│  └─────────┘     │Response │     └─────────┘     └─────────┘   │
+│                  └────┬────┘                          │         │
+│                       │         SSE/WebSocket         │         │
+│                       ▼                               ▼         │
+│                  ┌─────────────────────────────────────┐        │
+│                  │           Frontend Display          │        │
+│                  │   "Your burn rate is $127,500..."   │        │
+│                  │   [typing indicator]                │        │
+│                  └─────────────────────────────────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Stream Event Types
+
+| Event | Description | Example |
+|-------|-------------|---------|
+| `token` | Individual text token | "Your", "burn", "rate" |
+| `thinking` | AI reasoning step | "Calculating 6-month average..." |
+| `data` | Structured data payload | `{table: [...], chart: {...}}` |
+| `source` | Source citation | `{source: "Bank transactions", link: "..."}` |
+| `complete` | Response finished | `{total_tokens: 150, latency_ms: 2340}` |
+| `error` | Error occurred | `{error: "Query timeout", code: 408}` |
+
+### 8.3 Implementation
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Backend** | FastAPI StreamingResponse | Async generator for tokens |
+| **Transport** | Server-Sent Events (SSE) | Unidirectional real-time stream |
+| **Frontend** | EventSource API | Native browser SSE support |
+| **Fallback** | Polling with complete response | Legacy browser support |
+
+### 8.4 User Experience Benefits
+
+- **Immediate Feedback** — Users see response within 200ms
+- **Interruptible** — Cancel button stops generation mid-stream
+- **Progress Visibility** — Show reasoning steps as they happen
+- **Reduced Perceived Latency** — 3-second query feels instant
+
+---
+
+## 9. Voice-to-Query
+
+Users can ask questions using voice input, enabling hands-free interaction during meetings or while multitasking.
+
+### 9.1 Voice Input Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    VOICE-TO-QUERY FLOW                           │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐   │
+│  │  Voice  │────▶│  Speech │────▶│  Text   │────▶│ Instant │   │
+│  │  Input  │     │  to     │     │  Query  │     │ Answers │   │
+│  │  (Mic)  │     │  Text   │     │         │     │ Engine  │   │
+│  └─────────┘     └─────────┘     └─────────┘     └─────────┘   │
+│                       │                               │         │
+│            ┌──────────┴──────────┐                   │         │
+│            ▼                     ▼                   ▼         │
+│     ┌─────────────┐      ┌─────────────┐     ┌─────────────┐   │
+│     │ Web Speech  │      │   Whisper   │     │  Streaming  │   │
+│     │ API (Browser│      │   (Server)  │     │  Response   │   │
+│     └─────────────┘      └─────────────┘     └─────────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 9.2 Voice Input Methods
+
+| Method | Technology | Use Case |
+|--------|------------|----------|
+| **Browser-Based** | Web Speech API | Quick queries, Chrome/Edge |
+| **Server-Based** | OpenAI Whisper | Accuracy-critical, all browsers |
+| **Mobile** | Native Speech APIs | iOS/Android apps |
+
+### 9.3 Voice Commands
+
+| Command Pattern | Example | Action |
+|-----------------|---------|--------|
+| **Direct Question** | "What is our burn rate?" | Execute query |
+| **Follow-up** | "Break that down by month" | Continue conversation |
+| **Navigation** | "Show me the cash dashboard" | Navigate to page |
+| **Action** | "Approve this entry" | Trigger workflow |
+| **Cancel** | "Stop" or "Cancel" | Interrupt current operation |
+
+### 9.4 Voice Features
+
+| Feature | Description |
+|---------|-------------|
+| **Wake Word (Optional)** | "Hey Zero, what's our runway?" |
+| **Continuous Listening** | Toggle for meeting mode |
+| **Transcription Display** | Show recognized text for confirmation |
+| **Correction** | "No, I said gross margin" |
+| **Language Support** | English (primary), Spanish, French, German |
+
+### 9.5 Privacy and Security
+
+| Control | Implementation |
+|---------|----------------|
+| **Opt-In Only** | Voice features disabled by default |
+| **Local Processing** | Browser-based STT when possible |
+| **No Storage** | Audio not retained after transcription |
+| **Audit Log** | Voice queries logged as text only |
+
+---
+
+## 10. Related Documentation
  
  - [Semantic Search Overview](semantic-search.md)
  - [AI & Analysis](../technical/ai-analysis.md)

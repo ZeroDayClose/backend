@@ -442,7 +442,140 @@
  
  ---
  
- ## 8. Related Documentation
+## 8. No-Code Workflow Builder
+
+Finance teams can create and customize close workflows without developer assistance using the visual workflow builder.
+
+### 8.1 Workflow Builder Interface
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   NO-CODE WORKFLOW BUILDER                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │                     Canvas Area                          │    │
+│  │                                                          │    │
+│  │  ┌─────────┐     ┌─────────┐     ┌─────────┐            │    │
+│  │  │  Start  │────▶│  Bank   │────▶│  AR     │            │    │
+│  │  │  Close  │     │  Recon  │     │  Recon  │            │    │
+│  │  └─────────┘     └─────────┘     └─────────┘            │    │
+│  │                       │               │                  │    │
+│  │                       ▼               ▼                  │    │
+│  │                  ┌─────────┐     ┌─────────┐            │    │
+│  │                  │Generate │     │  Review │            │    │
+│  │                  │Accruals │     │ Variances│            │    │
+│  │                  └─────────┘     └─────────┘            │    │
+│  │                       │               │                  │    │
+│  │                       └───────┬───────┘                  │    │
+│  │                               ▼                          │    │
+│  │                         ┌─────────┐                      │    │
+│  │                         │  Close  │                      │    │
+│  │                         │ Period  │                      │    │
+│  │                         └─────────┘                      │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Component Palette:                                             │
+│  [Reconciliation] [Journal Entry] [Approval] [Notification]    │
+│  [Condition] [Parallel] [Wait] [Manual Task]                    │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Available Components
+
+| Component | Description | Configuration |
+|-----------|-------------|---------------|
+| **Reconciliation Task** | Auto-reconcile an account | Account, tolerance, auto-approve threshold |
+| **Journal Entry** | Generate and post JE | Template, accounts, calculation |
+| **Approval Gate** | Require human approval | Approver role, escalation time |
+| **Notification** | Send alert | Recipients, channels, message template |
+| **Condition** | Branch based on criteria | If/else logic, thresholds |
+| **Parallel** | Run tasks simultaneously | Merge strategy (all/any) |
+| **Wait** | Pause for time or event | Duration, trigger event |
+| **Manual Task** | Assign to user | Assignee, instructions, due date |
+
+### 8.3 Workflow Templates
+
+| Template | Description | Steps |
+|----------|-------------|-------|
+| **Standard Month-End** | Default close workflow | 12 steps, 3 approval gates |
+| **Quick Close** | Streamlined for mature processes | 8 steps, 1 approval gate |
+| **Audit-Ready** | Extra documentation steps | 15 steps, 5 approval gates |
+| **First Close** | Guided setup for new companies | 10 steps with tutorials |
+
+### 8.4 Workflow Features
+
+| Feature | Description |
+|---------|-------------|
+| **Drag-and-Drop** | Visual workflow construction |
+| **Version Control** | Track changes, rollback to previous versions |
+| **Testing Mode** | Dry-run workflow without posting |
+| **Cloning** | Duplicate and modify existing workflows |
+| **Import/Export** | Share workflows as JSON/YAML |
+| **Scheduling** | Trigger automatically at period end |
+
+---
+
+## 9. Rollback and Undo
+
+All close operations support rollback, enabling error correction without manual reversals.
+
+### 9.1 Rollback Capabilities
+
+| Operation | Rollback Action | Scope |
+|-----------|-----------------|-------|
+| **Journal Entry** | Generate reversing entry | Single JE |
+| **Reconciliation** | Unreconcile, restore pending status | Single account |
+| **Batch JE Posting** | Reverse all entries in batch | Batch |
+| **Accrual Generation** | Reverse accruals for period | All accruals |
+| **Period Close** | Reopen period (with approval) | Entire period |
+
+### 9.2 Rollback Workflow
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ROLLBACK FLOW                                 │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  1. User requests rollback                                      │
+│     ├── Select item(s) to rollback                             │
+│     └── Provide reason                                          │
+│                                                                  │
+│  2. System validates                                            │
+│     ├── Check rollback eligibility (time window, dependencies) │
+│     └── Preview impact (downstream effects)                    │
+│                                                                  │
+│  3. Approval (if required)                                      │
+│     ├── Route to approver based on materiality                 │
+│     └── Approver reviews impact and approves                   │
+│                                                                  │
+│  4. Execute rollback                                            │
+│     ├── Generate compensating entries                          │
+│     ├── Update status of affected items                        │
+│     └── Notify relevant users                                  │
+│                                                                  │
+│  5. Audit trail                                                 │
+│     ├── Log original action                                    │
+│     ├── Log rollback action                                    │
+│     └── Store reason and approver                              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 9.3 Rollback Controls
+
+| Control | Configuration |
+|---------|---------------|
+| **Time Window** | Rollback allowed within X hours (default: 24) |
+| **Materiality Threshold** | Amounts above $X require approval |
+| **Period Lock** | Cannot rollback in locked periods |
+| **Dependency Check** | Warn if downstream items affected |
+| **Audit Requirement** | Reason required for all rollbacks |
+
+---
+
+## 10. Related Documentation
  
  - [Automated Close Module Overview](../modules/automated-close.md)
  - [Audit-Ready Workflow](audit-ready-workflow.md)

@@ -238,8 +238,78 @@ Breakdown by account:
 
 ---
 
+## Voice Input
+
+Ask questions hands-free using voice input, perfect for meetings or multitasking.
+
+### Voice Interface
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│ 🔍  Ask anything about your financial data...          [🎤]    │
+│                                                                 │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │  🎤 Listening...                                        │   │
+│  │                                                          │   │
+│  │  "What is our gross margin for Q4?"                     │   │
+│  │   ▲ Recognized text                                     │   │
+│  │                                                          │   │
+│  │  [Cancel]                          [Submit Query]       │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Voice Activation
+
+| Method | Description |
+|--------|-------------|
+| **Click Microphone** | Click the mic icon in search bar |
+| **Keyboard Shortcut** | `Cmd/Ctrl + .` to toggle voice |
+| **Wake Word** | "Hey Zero, [question]" (optional, Settings) |
+
+### Voice Commands
+
+| Command Type | Examples |
+|--------------|----------|
+| **Questions** | "What's our burn rate?" |
+| **Follow-ups** | "Break that down by month" |
+| **Navigation** | "Go to cash dashboard" |
+| **Actions** | "Show my pending approvals" |
+| **Control** | "Stop", "Cancel", "Go back" |
+
+### Voice Features
+
+| Feature | Description |
+|---------|-------------|
+| **Real-Time Transcription** | See words as you speak |
+| **Correction** | "No, I said revenue not expense" |
+| **Confirmation** | Review before submitting |
+| **Continuous Mode** | Keep listening for follow-ups |
+| **Language Support** | English, Spanish, French, German |
+
+### Technology
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Browser STT** | Web Speech API | Fast, privacy-friendly |
+| **Server STT** | OpenAI Whisper | Higher accuracy |
+| **Fallback** | Automatic switching | Best available |
+
+### Privacy Controls
+
+| Control | Default | Description |
+|---------|---------|-------------|
+| **Voice Enabled** | Off | Opt-in only |
+| **Local Processing** | On | Use browser API when possible |
+| **Audio Storage** | Never | Audio deleted after transcription |
+| **Transcript Logging** | Yes | Text queries logged for history |
+
+---
+
 ## Related Features
 
 - [Semantic Search](../features/semantic-search.md) — Technical details
 - [Dashboards](../features/dashboards.md) — Visual analytics
 - [Alerts](../features/alerts-notifications.md) — Proactive notifications
+- [Instant Answers](../features/instant-answers-detailed.md) — Full query engine documentation

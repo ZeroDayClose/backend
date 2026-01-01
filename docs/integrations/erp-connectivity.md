@@ -138,3 +138,113 @@ During onboarding, an AI agent:
 | **QBO/Xero** | Full (Journal Entries) |
 
 Write operations are always validated by the [Audit-Ready Workflow](../features/audit-ready-workflow.md) before execution.
+
+---
+
+## LLM Function Calling for ERP Integration
+
+ZeroDayClose's AI agents can directly interact with ERP systems through structured function calls, enabling dynamic data retrieval and write-back operations.
+
+### Function Calling Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 LLM FUNCTION CALLING LAYER                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  User: "What's the payment status for invoice INV-1234?"        │
+│                              │                                   │
+│                              ▼                                   │
+│                    ┌─────────────────┐                          │
+│                    │   LLM Reasoning │                          │
+│                    │   + Tool Choice │                          │
+│                    └────────┬────────┘                          │
+│                             │                                    │
+│                             ▼                                    │
+│                    ┌─────────────────┐                          │
+│                    │  get_invoice()  │  ◀── Function Call       │
+│                    └────────┬────────┘                          │
+│                             │                                    │
+│              ┌──────────────┼──────────────┐                    │
+│              ▼              ▼              ▼                    │
+│      ┌────────────┐  ┌────────────┐  ┌────────────┐            │
+│      │  NetSuite  │  │   Intacct  │  │    SAP     │            │
+│      │  Connector │  │  Connector │  │  Connector │            │
+│      └────────────┘  └────────────┘  └────────────┘            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Available ERP Functions
+
+| Function | Description | Read/Write |
+|----------|-------------|------------|
+| `get_invoice(invoice_id)` | Retrieve invoice details | Read |
+| `get_vendor(vendor_id)` | Retrieve vendor information | Read |
+| `get_customer(customer_id)` | Retrieve customer information | Read |
+| `get_trial_balance(period)` | Retrieve trial balance for period | Read |
+| `get_gl_transactions(filters)` | Query GL transactions | Read |
+| `get_open_invoices(customer_id)` | List unpaid invoices | Read |
+| `get_open_bills(vendor_id)` | List unpaid bills | Read |
+| `post_journal_entry(entry)` | Post journal entry to ERP | Write |
+| `create_invoice(invoice)` | Create new invoice | Write |
+| `apply_payment(payment)` | Apply payment to invoice | Write |
+
+### Function Definition Example
+
+```
+Function: get_invoice
+├── Description: Retrieve invoice details from ERP
+├── Parameters:
+│   ├── invoice_id: string (required)
+│   ├── include_line_items: boolean (default: true)
+│   └── include_payments: boolean (default: false)
+├── Returns:
+│   ├── invoice_number: string
+│   ├── customer_name: string
+│   ├── amount: decimal
+│   ├── due_date: date
+│   ├── status: enum (open, partial, paid)
+│   ├── line_items: array (if requested)
+│   └── payments: array (if requested)
+└── Permissions: Requires 'ar.read' scope
+```
+
+### Security and Controls
+
+| Control | Implementation |
+|---------|----------------|
+| **Permission Scoping** | Each function requires specific RBAC permissions |
+| **Rate Limiting** | Per-user and per-ERP rate limits enforced |
+| **Audit Logging** | All function calls logged with parameters and results |
+| **Sandbox Mode** | Read-only queries for exploration |
+| **Write Approval** | Write operations require human approval via exception workflow |
+| **Credential Isolation** | ERP credentials never exposed to LLM |
+
+### ERP-Specific Adapters
+
+Each ERP connector translates function calls to native API calls:
+
+| ERP | Adapter | Example Translation |
+|-----|---------|---------------------|
+| **NetSuite** | SuiteQL + REST | `get_invoice()` → SuiteQL SELECT |
+| **Intacct** | XML SDK | `get_invoice()` → XML readByQuery |
+| **SAP** | OData/RFC | `get_invoice()` → BAPI_CUSTOMER call |
+| **Oracle** | REST API | `get_invoice()` → AR Invoice REST endpoint |
+| **QBO** | REST API | `get_invoice()` → /v3/invoice/[id] |
+
+### Benefits
+
+- **Natural Language ERP Queries** — Users ask questions, AI handles API complexity
+- **Cross-ERP Abstraction** — Same functions work across all connected ERPs
+- **Audit Trail** — Every query and action logged for compliance
+- **Controlled Write Access** — Human approval gates for all write operations
+
+---
+
+## Related Documentation
+
+- [Supported Systems](supported-systems.md) — Full integration list
+- [Integrations Management](../admin/integrations-management.md) — Admin configuration
+- [AI & Analysis](../technical/ai-analysis.md) — Function calling details
+- [Audit-Ready Workflow](../features/audit-ready-workflow.md) — Write operation controls

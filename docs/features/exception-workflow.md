@@ -169,8 +169,94 @@ Administrators can configure what triggers exceptions:
 
 ---
 
+## Collaborative Annotations
+
+Team members can collaborate on exception resolution through real-time annotations, comments, and shared context.
+
+### Annotation Features
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   EXCEPTION DETAIL VIEW                          │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Exception: Payment $15,000 - Low Confidence Match              │
+│  Status: Under Review                                           │
+│                                                                  │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  AI Recommendation: Match to INV-1234 (78% confidence)  │    │
+│  │                                                          │    │
+│  │  [Highlighted] Amount matches but vendor name differs    │    │
+│  │                ^^^^^^^^^^^^^^^^                          │    │
+│  │                └── @john: "This is their new legal name" │    │
+│  │                                                          │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  Comments Thread:                                               │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │ @sarah (2 min ago): I've seen this before, vendor       │    │
+│  │                     changed name after acquisition.      │    │
+│  │                                                          │    │
+│  │ @john (1 min ago): Confirmed. Updating vendor master.   │    │
+│  │                    [Attached: vendor_name_change.pdf]   │    │
+│  │                                                          │    │
+│  │ [Type a comment... @mention to notify]           [Send] │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│  [Approve] [Reject] [Reassign] [Add Annotation]                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Collaboration Capabilities
+
+| Feature | Description |
+|---------|-------------|
+| **Inline Annotations** | Highlight and comment on specific data points |
+| **@Mentions** | Tag team members for input or notification |
+| **Threaded Comments** | Reply chains for focused discussion |
+| **File Attachments** | Attach supporting documents to comments |
+| **Real-Time Sync** | See others' annotations as they type |
+| **Presence Indicators** | See who else is viewing the exception |
+| **Reaction Emojis** | Quick acknowledgment without full comment |
+
+### Real-Time Collaboration
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Sync Engine** | Liveblocks / Y.js | Real-time collaboration |
+| **Presence** | WebSocket | Show active viewers |
+| **Conflict Resolution** | CRDT | Handle simultaneous edits |
+| **Persistence** | PostgreSQL | Store annotations and comments |
+
+### Annotation Types
+
+| Type | Use Case | Visual |
+|------|----------|--------|
+| **Highlight** | Draw attention to specific text | Yellow background |
+| **Question** | Ask for clarification | Blue underline with ? |
+| **Correction** | Suggest a fix | Red strikethrough + green text |
+| **Approval Note** | Explain approval rationale | Green checkmark |
+| **Concern** | Flag potential issue | Orange warning icon |
+
+### Audit Trail
+
+All annotations and comments are preserved in the audit trail:
+
+| Logged Data | Description |
+|-------------|-------------|
+| **Author** | Who created the annotation |
+| **Timestamp** | When it was created |
+| **Content** | The annotation text |
+| **Target** | What data element was annotated |
+| **Attachments** | Any files attached |
+| **Resolution** | How the exception was ultimately resolved |
+
+---
+
 ## Related Features
 
 - [Audit-Ready Workflow](audit-ready-workflow.md) — The Doer/Critic architecture
 - [Alerts & Notifications](alerts-notifications.md) — Notification system
 - [Dashboards](dashboards.md) — Exception status dashboard
+- [Interface Design](../ui/interface-design.md) — UI components

@@ -58,7 +58,51 @@ ZeroDayClose uses a sophisticated AI system for financial analysis and automatio
 
 ## Context Graph Technology
 
-The Context Graph enables multi-hop reasoning across financial data.
+The Context Graph is the central knowledge store that enables multi-hop reasoning across financial data, powering intelligent automation and contextual understanding.
+
+### Context Graph Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      CONTEXT GRAPH                               │
+│                    (Neo4j Graph Database)                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐   │
+│  │ Vendors │────▶│Invoices │────▶│Payments │────▶│ GL Accts│   │
+│  └─────────┘     └─────────┘     └─────────┘     └─────────┘   │
+│       │               │               │               │         │
+│       ▼               ▼               ▼               ▼         │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐   │
+│  │Patterns │     │Contracts│     │ Users   │     │ Policies│   │
+│  └─────────┘     └─────────┘     └─────────┘     └─────────┘   │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Graph Node Types
+
+| Node Type | Description | Key Properties |
+|-----------|-------------|----------------|
+| **Vendor** | Supplier/vendor entities | name, tax_id, payment_terms, risk_score |
+| **Customer** | Customer entities | name, segment, credit_limit, payment_history |
+| **Transaction** | Financial transactions | amount, date, type, status |
+| **Account** | GL accounts | code, name, type, normal_balance |
+| **Pattern** | Learned behavioral patterns | confidence, frequency, last_seen |
+| **Policy** | Business rules and policies | rule_type, threshold, action |
+| **User** | System users | role, approvals_given, corrections_made |
+| **Contract** | Revenue contracts | value, start_date, obligations |
+
+### Graph Relationships
+
+| Relationship | From | To | Properties |
+|--------------|------|-----|------------|
+| `PAID_BY` | Invoice | Payment | amount, date |
+| `BELONGS_TO` | Transaction | Account | period |
+| `HAS_PATTERN` | Vendor | Pattern | confidence |
+| `APPROVED_BY` | Transaction | User | timestamp |
+| `GOVERNED_BY` | Account | Policy | effective_date |
+| `SIMILAR_TO` | Vendor | Vendor | similarity_score |
 
 <details>
 <summary><strong>How It Works</strong></summary>
@@ -76,8 +120,20 @@ Path: Transaction → Vendor (Acme Corp) → Historical Patterns →
 - Approval patterns by user
 - Seasonal trends
 - Policy exceptions
+- Entity relationships and hierarchies
+- Historical correction patterns
 
 </details>
+
+### Graph-Powered Features
+
+| Feature | Graph Query Pattern |
+|---------|---------------------|
+| **Smart Categorization** | Traverse vendor → historical patterns → most common account |
+| **Anomaly Detection** | Compare transaction to vendor's typical patterns |
+| **Approval Routing** | Find appropriate approver based on amount + entity + type |
+| **Vendor Deduplication** | Identify similar vendors via relationship scoring |
+| **Impact Analysis** | Trace downstream effects of account changes |
 
 ---
 
@@ -158,3 +214,184 @@ Continuous monitoring for unusual patterns:
 | **Graph Visualization** | React Flow or D3.js |
 | **Interactive Exploration** | Click-through to source data |
 | **Reasoning Display** | Step-by-step AI decision path |
+
+---
+
+## Structured Output Enforcement
+
+All LLM outputs are validated against strict schemas to ensure reliability and prevent hallucination.
+
+### Technology Stack
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Schema Definition** | Pydantic Models | Define expected output structure |
+| **LLM Enforcement** | Instructor / Outlines | Force LLM to produce valid JSON |
+| **Validation** | Pydantic Validators | Runtime validation of outputs |
+| **Fallback** | Retry with structured prompts | Handle malformed responses |
+
+### Implementation Pattern
+
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   User Query    │────▶│   LLM + Schema  │────▶│ Validated Output│
+│                 │     │   Enforcement   │     │  (Pydantic)     │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │  Schema Examples:   │
+                    │  - JournalEntry     │
+                    │  - MatchResult      │
+                    │  - CategoryPrediction│
+                    │  - ContractTerms    │
+                    └─────────────────────┘
+```
+
+### Output Schema Examples
+
+| Schema | Fields | Use Case |
+|--------|--------|----------|
+| `JournalEntrySchema` | date, lines[], memo, confidence | Auto-generated journal entries |
+| `MatchResultSchema` | invoice_id, payment_id, confidence, reasoning | Cash application matching |
+| `CategorySchema` | account_id, category, confidence, alternatives[] | Expense categorization |
+| `ContractTermsSchema` | obligations[], dates, amounts, clauses[] | Contract parsing |
+| `AnomalySchema` | type, severity, evidence[], recommendation | Anomaly detection |
+
+### Benefits
+
+- **No Hallucination** — LLM cannot return unexpected fields
+- **Type Safety** — All outputs are typed and validated
+- **Audit Trail** — Schema version tracked with each decision
+- **Error Handling** — Graceful fallback on validation failures
+
+---
+
+## Function Calling for Integrations
+
+LLMs can directly interact with external systems through structured function calls, enabling dynamic data retrieval and action execution.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    FUNCTION CALLING LAYER                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  User Query: "What's the payment status for invoice INV-1234?"  │
+│                              │                                   │
+│                              ▼                                   │
+│                    ┌─────────────────┐                          │
+│                    │   LLM Reasoning │                          │
+│                    │   + Tool Choice │                          │
+│                    └────────┬────────┘                          │
+│                             │                                    │
+│              ┌──────────────┼──────────────┐                    │
+│              ▼              ▼              ▼                    │
+│      ┌────────────┐  ┌────────────┐  ┌────────────┐            │
+│      │ ERP Tools  │  │ Bank Tools │  │ CRM Tools  │            │
+│      │ get_invoice│  │ get_balance│  │get_customer│            │
+│      │ post_je    │  │ get_txns   │  │get_contract│            │
+│      └────────────┘  └────────────┘  └────────────┘            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Available Tool Categories
+
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **ERP Tools** | `get_invoice`, `get_vendor`, `post_journal_entry`, `get_trial_balance` | Read/write to ERP systems |
+| **Bank Tools** | `get_bank_balance`, `get_transactions`, `get_statement` | Query bank data |
+| **CRM Tools** | `get_customer`, `get_contract`, `get_opportunity` | Access sales data |
+| **Internal Tools** | `search_documents`, `get_audit_trail`, `query_graph` | Query internal systems |
+| **Calculation Tools** | `calculate_depreciation`, `compute_allocation`, `forecast_cash` | Perform computations |
+
+### Tool Definition Example
+
+```
+Tool: get_invoice
+├── Parameters:
+│   ├── invoice_id: string (required)
+│   └── include_payments: boolean (optional)
+├── Returns:
+│   ├── invoice_number, amount, due_date, status
+│   ├── customer_name, payment_terms
+│   └── payments[]: applied payments if requested
+└── Permissions: Requires 'ar.read' scope
+```
+
+### Security Controls
+
+| Control | Implementation |
+|---------|----------------|
+| **Scoped Permissions** | Each tool requires specific RBAC permissions |
+| **Rate Limiting** | Per-user and per-tool rate limits |
+| **Audit Logging** | All function calls logged with parameters and results |
+| **Sandbox Mode** | Read-only mode for exploratory queries |
+| **Approval Gates** | Write operations require human approval |
+
+---
+
+## Streaming LLM Responses
+
+For real-time user experience, LLM responses are streamed token-by-token to the frontend.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   STREAMING RESPONSE FLOW                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐   │
+│  │ User    │────▶│ FastAPI │────▶│  LLM    │────▶│ Stream  │   │
+│  │ Query   │     │Streaming│     │  API    │     │ Response│   │
+│  └─────────┘     │Response │     └─────────┘     └─────────┘   │
+│                  └────┬────┘                          │         │
+│                       │                               │         │
+│                       ▼                               ▼         │
+│                  ┌─────────────────────────────────────┐        │
+│                  │  Server-Sent Events (SSE)           │        │
+│                  │  or WebSocket Connection            │        │
+│                  └─────────────────────────────────────┘        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Implementation
+
+| Component | Technology | Purpose |
+|-----------|------------|---------|
+| **Backend** | FastAPI StreamingResponse | Async token streaming |
+| **Transport** | Server-Sent Events (SSE) | Real-time delivery |
+| **Frontend** | EventSource API | Receive and render tokens |
+| **Fallback** | Complete response | For clients without SSE support |
+
+### Stream Event Types
+
+| Event | Description |
+|-------|-------------|
+| `token` | Individual token from LLM |
+| `thinking` | Reasoning step indicator |
+| `tool_call` | Function being invoked |
+| `tool_result` | Function result received |
+| `data` | Structured data (tables, charts) |
+| `complete` | Response finished |
+| `error` | Error occurred |
+
+### Benefits
+
+- **Perceived Speed** — Users see response immediately
+- **Interruptible** — Users can cancel long responses
+- **Progress Visibility** — Show reasoning steps in real-time
+- **Better UX** — Natural conversational feel
+
+---
+
+## Related Documentation
+
+- [Context Graph Details](../architecture/shadow-ledger.md)
+- [Technical Architecture](../architecture/technical-architecture-detailed.md)
+- [Instant Answers](../features/instant-answers-detailed.md)
+- [Continuous Learning](../features/continuous-learning.md)

@@ -90,6 +90,7 @@
  | **Sidecar Pattern** | Overlay on existing systems, no replacement |
  | **Audit-Ready** | Every action produces traceable evidence |
  | **ERP-Agnostic** | Unified model abstracts source system differences |
+| **Rollback-Capable** | All actions are reversible with full audit trail |
  
  ---
  
@@ -106,6 +107,8 @@
  | **Migrations** | Alembic | Database schema migrations |
  | **Task Queue** | Celery + Redis | Background job processing |
  | **Workflow** | Temporal.io | Long-running workflow orchestration |
+| **Event Streaming** | Apache Kafka / Redis Streams | Event-driven architecture |
+| **Message Broker** | Redis Pub/Sub | Real-time notifications |
  
  ### 2.2 Frontend Stack
  
@@ -504,9 +507,218 @@
  | **APM** | Datadog | Application performance |
  | **Alerts** | PagerDuty | Incident management |
  
+---
+
+## 8. Event-Driven Architecture
+
+ZeroDayClose uses an event-driven architecture to enable real-time processing, loose coupling, and scalability.
+
+### 8.1 Event Bus Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                      EVENT BUS (Kafka/Redis Streams)            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  Publishers                              Subscribers             │
+│  ┌─────────────┐                        ┌─────────────┐         │
+│  │ Close Svc   │──publish──▶ Topic ──▶──│ Notification│         │
+│  └─────────────┘            │           │   Service   │         │
+│  ┌─────────────┐            │           └─────────────┘         │
+│  │ Revenue Svc │──publish──▶│           ┌─────────────┐         │
+│  └─────────────┘            ├──────────▶│ Analytics   │         │
+│  ┌─────────────┐            │           │   Service   │         │
+│  │ Cash Svc    │──publish──▶│           └─────────────┘         │
+│  └─────────────┘            │           ┌─────────────┐         │
+│  ┌─────────────┐            └──────────▶│ Audit Log   │         │
+│  │ Integration │──publish──▶            │   Service   │         │
+│  └─────────────┘                        └─────────────┘         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 8.2 Event Types
+
+| Domain | Events |
+|--------|--------|
+| **Close** | `reconciliation.started`, `reconciliation.completed`, `je.created`, `je.approved`, `period.closed` |
+| **Revenue** | `contract.ingested`, `obligation.identified`, `revenue.recognized`, `schedule.modified` |
+| **Cash** | `payment.received`, `payment.matched`, `forecast.updated`, `anomaly.detected` |
+| **Integration** | `sync.started`, `sync.completed`, `sync.failed`, `data.refreshed` |
+| **User** | `user.login`, `approval.given`, `correction.made`, `exception.resolved` |
+
+### 8.3 Event Schema
+
+```
+Event Structure:
+├── event_id: UUID
+├── event_type: string (e.g., "reconciliation.completed")
+├── timestamp: ISO8601 datetime
+├── source: string (service name)
+├── entity_id: UUID (affected entity)
+├── user_id: UUID (actor, if applicable)
+├── payload: JSON (event-specific data)
+└── metadata:
+    ├── correlation_id: UUID (trace across services)
+    ├── causation_id: UUID (parent event)
+    └── version: string (schema version)
+```
+
+### 8.4 Event Processing Patterns
+
+| Pattern | Use Case | Implementation |
+|---------|----------|----------------|
+| **Pub/Sub** | Notifications, logging | Redis Pub/Sub |
+| **Event Sourcing** | Audit trail, replay | Kafka with compaction |
+| **CQRS** | Separate read/write models | Snowflake for reads |
+| **Saga** | Distributed transactions | Temporal.io workflows |
+| **Dead Letter Queue** | Failed event handling | Kafka DLQ topic |
+
+---
+
+## 9. Rollback and Undo Capabilities
+
+All financial operations support rollback to maintain data integrity and enable error correction.
+
+### 9.1 Rollback Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ROLLBACK SYSTEM                               │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
+│  │  Original   │────▶│  Event      │────▶│  State      │        │
+│  │  Action     │     │  Stored     │     │  Applied    │        │
+│  └─────────────┘     └─────────────┘     └─────────────┘        │
+│                             │                    │               │
+│                             ▼                    ▼               │
+│                      ┌─────────────┐     ┌─────────────┐        │
+│                      │  Rollback   │◀────│  Undo       │        │
+│                      │  Event      │     │  Requested  │        │
+│                      └─────────────┘     └─────────────┘        │
+│                             │                                    │
+│                             ▼                                    │
+│                      ┌─────────────┐                            │
+│                      │  Compensating│                            │
+│                      │  Action      │                            │
+│                      └─────────────┘                            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 9.2 Rollback-Capable Operations
+
+| Operation | Rollback Method | Scope |
+|-----------|-----------------|-------|
+| **Journal Entry** | Reversing entry with opposite debits/credits | Single entry |
+| **Payment Application** | Unapply payment, restore open invoice | Single match |
+| **Reconciliation** | Unreconcile, restore pending status | Single account |
+| **Revenue Recognition** | Reverse recognized amount, restore deferred | Schedule entry |
+| **Categorization** | Revert to previous category | Single transaction |
+| **Batch Import** | Rollback all records from batch | Entire batch |
+| **Period Close** | Reopen period (with approval) | Full period |
+
+### 9.3 Rollback Controls
+
+| Control | Description |
+|---------|-------------|
+| **Time Window** | Rollback allowed within configurable period (e.g., 24 hours) |
+| **Approval Required** | High-value rollbacks require manager approval |
+| **Audit Trail** | Full logging of original action and rollback |
+| **Cascade Detection** | Warn if rollback affects downstream data |
+| **Lock Prevention** | Cannot rollback if period is locked |
+
+### 9.4 Implementation
+
+```
+Class: RollbackManager
+├── Method: can_rollback(action_id) → RollbackEligibility
+├── Method: preview_rollback(action_id) → RollbackImpact
+├── Method: execute_rollback(action_id, reason) → RollbackResult
+├── Method: get_rollback_history(entity_id) → List[RollbackRecord]
+└── Method: generate_compensating_action(action) → Action
+```
+
+---
+
+## 10. Async Batch Processing
+
+Large-scale operations are processed asynchronously in batches for performance and reliability.
+
+### 10.1 Batch Processing Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                   BATCH PROCESSING SYSTEM                        │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐        │
+│  │  Batch      │────▶│   Queue     │────▶│  Worker     │        │
+│  │  Request    │     │  (Celery)   │     │   Pool      │        │
+│  └─────────────┘     └─────────────┘     └─────────────┘        │
+│                                                 │                │
+│                        ┌────────────────────────┤                │
+│                        ▼                        ▼                │
+│                 ┌─────────────┐         ┌─────────────┐         │
+│                 │  Parallel   │         │  Progress   │         │
+│                 │  Execution  │         │  Tracking   │         │
+│                 └─────────────┘         └─────────────┘         │
+│                        │                        │                │
+│                        ▼                        ▼                │
+│                 ┌─────────────┐         ┌─────────────┐         │
+│                 │  Results    │         │  WebSocket  │         │
+│                 │  Aggregation│         │  Updates    │         │
+│                 └─────────────┘         └─────────────┘         │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 10.2 Batch Operation Types
+
+| Operation | Batch Size | Parallelism | Typical Duration |
+|-----------|------------|-------------|------------------|
+| **Bank Transaction Import** | 10,000 per batch | 10 workers | 2-5 minutes |
+| **Invoice Matching** | 1,000 per batch | 20 workers | 1-3 minutes |
+| **Reconciliation** | 100 accounts | 10 workers | 5-10 minutes |
+| **Revenue Schedule Generation** | 500 contracts | 5 workers | 3-5 minutes |
+| **Report Generation** | 1 report | 1 worker | 30 seconds - 2 minutes |
+| **Data Export** | 100,000 rows | 5 workers | 1-5 minutes |
+
+### 10.3 Batch Processing Features
+
+| Feature | Description |
+|---------|-------------|
+| **Progress Tracking** | Real-time progress via WebSocket |
+| **Partial Failure** | Continue processing on individual failures |
+| **Retry Logic** | Automatic retry with exponential backoff |
+| **Priority Queues** | High-priority batches processed first |
+| **Rate Limiting** | Respect external API limits |
+| **Checkpointing** | Resume from last checkpoint on failure |
+| **Result Aggregation** | Consolidated success/failure summary |
+
+### 10.4 Celery Task Patterns
+
+| Pattern | Use Case |
+|---------|----------|
+| **chord** | Fan-out processing with aggregation callback |
+| **group** | Parallel execution of independent tasks |
+| **chain** | Sequential task execution |
+| **chunks** | Split large lists into parallel batches |
+
+### 10.5 Monitoring
+
+| Metric | Description |
+|--------|-------------|
+| **Queue Depth** | Number of pending batch jobs |
+| **Processing Time** | Average/p95/p99 batch duration |
+| **Success Rate** | Percentage of successful batches |
+| **Worker Utilization** | CPU/memory usage per worker |
+| **Retry Rate** | Frequency of task retries |
+
  ### 7.2 Key Metrics
  
- | Category | Metrics |
+## 11. Related Documentation
  |----------|---------|
  | **Availability** | Uptime %, error rate |
  | **Performance** | Response time p50/p95/p99 |
